@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Col, List, message, Row, Space,} from 'antd';
-import {LikeOutlined, MessageOutlined, StarOutlined} from "@ant-design/icons-svg";
+import {Avatar, Card, Col, List, message, Row, Space, Statistic,} from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
 import * as $ from 'jquery';
+import axios from "axios";
 const DataSet = require('@antv/data-set');
 
 //chart
@@ -52,8 +53,40 @@ const fakeDataUrl =
     'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
 const ContainerHeight = 900;
 const FxDb : React.FC = () => {
+    const [datalist, setDatalist] = useState([]);
 
-    //chart
+    useEffect(() => {
+        axios.get('/api/users').then(response => {
+            setData(response.data);
+        });
+    }, []);
+//
+//     //list
+//
+//
+    const [datachart1, setDatachart] = useState([]);
+
+    useEffect(() => {
+        axios.get('/api/users').then(response => {
+            setData(response.data);
+        });
+    }, []);
+//
+//
+//     //chart
+//
+//
+//
+    const [datanews, setDatanews] = useState([]);
+
+    useEffect(() => {
+        axios.get('/api/users').then(response => {
+            setData(response.data);
+        });
+    }, []);
+
+//     //news
+
 
     const [data, setData] = useState<UserItem[]>([]);
 
@@ -75,20 +108,8 @@ const FxDb : React.FC = () => {
             appendData();
         }
     };
-    const data1 = [
-        {
-            title: 'Ant Design Title 1',
-        },
-        {
-            title: 'Ant Design Title 2',
-        },
-        {
-            title: 'Ant Design Title 3',
-        },
-        {
-            title: 'Ant Design Title 4',
-        },
-    ];
+
+
     const datatest = Array.from({ length: 23 }).map((_, i) => ({
         href: 'https://ant.design',
         title: `ant design part ${i}`,
@@ -109,7 +130,7 @@ const FxDb : React.FC = () => {
                         data={data}
                         height={ContainerHeight}
                         itemHeight={30}
-                        itemKey="email"
+                        itemKey="id"
                         onScroll={onScroll}
                     >
                         {(item: UserItem) => (
@@ -126,13 +147,22 @@ const FxDb : React.FC = () => {
                 </List>
             </Col>
             <Col span={11}>
-                <Chart forceFit height={600} data={datachart} scale={scale}>
+                <Card bordered={false}>
+                    <Statistic
+                        title="Active"
+                        value={11.28}
+                        precision={2}
+                        valueStyle={{ color: '#3f8600' }}
+                        prefix={<ArrowUpOutlined />}
+                        suffix="%"
+                    />
+                </Card>
+                <Chart forceFit height={750} data={data} scale={scale}>
                     <Tooltip />
                     <Axis />
                     <Line position="year*value" />
                     <Point position="year*value" shape="circle"/>
                 </Chart>
-
             </Col>
             <Col span={8}>
                 <List

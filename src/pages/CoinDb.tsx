@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Col, List, message, Row, Space,} from 'antd';
-import {LikeOutlined, MessageOutlined, StarOutlined} from "@ant-design/icons-svg";
+import {Avatar, Card, Col, List, message, Row, Space, Statistic,} from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
 import * as $ from 'jquery';
@@ -102,7 +102,7 @@ const CoinDb : React.FC = () => {
 
     return (
         <Row >
-            <Col span={5}>
+            <Col span={6}>
 
                 <List size="large">
                     <VirtualList
@@ -125,7 +125,24 @@ const CoinDb : React.FC = () => {
                     </VirtualList>
                 </List>
             </Col>
-            <Col span={11}>
+            <Col span={10}>
+                <Card bordered={false}>
+                    <Statistic
+                        title="Active"
+                        value={11.28}
+                        precision={2}
+                        valueStyle={{ color: '#3f8600' }}
+                        prefix={<ArrowUpOutlined />}
+                        suffix="%"
+                    />
+                </Card>
+                {/*<Chart forceFit height={750} data={data} scale={scale}>*/}
+                {/*    <Tooltip />*/}
+                {/*    <Axis />*/}
+                {/*    <Line position="year*value" />*/}
+                {/*    <Point position="year*value" shape="circle"/>*/}
+                {/*</Chart>*/}
+
                 <Chart forceFit height={600} data={datachart} scale={scale}>
                     <Tooltip />
                     <Axis />
