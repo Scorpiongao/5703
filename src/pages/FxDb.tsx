@@ -34,29 +34,20 @@ const scale = [{
 //chart
 
 interface UserItem {
-    email: string;
-    gender: string;
-    name: {
-        first: string;
-        last: string;
-        title: string;
-    };
-    nat: string;
-    picture: {
-        large: string;
-        medium: string;
-        thumbnail: string;
-    };
+    id:number;
+    title: string;
+    price: string;
+
 }
 
 const fakeDataUrl =
-    'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
+    'http://localhost:8080/dashboard/alpha_api';
 const ContainerHeight = 900;
 const FxDb : React.FC = () => {
     const [datalist, setDatalist] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/users').then(response => {
+        axios.get('/dashboard/alpha_api').then(response => {
             setData(response.data);
         });
     }, []);
@@ -134,11 +125,11 @@ const FxDb : React.FC = () => {
                         onScroll={onScroll}
                     >
                         {(item: UserItem) => (
-                            <List.Item key={item.email}>
+                            <List.Item key={item.id}>
                                 <List.Item.Meta
-                                    avatar={<Avatar src={item.picture.large} />}
-                                    title={<a href="https://ant.design">{item.name.last}</a>}
-                                    description={item.email}
+                                    // avatar={<Avatar src={item.picture.large} />}
+                                    title={<a href="https://ant.design">{item.title}</a>}
+                                    description={item.price}
                                 />
 
                             </List.Item>
