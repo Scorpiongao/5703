@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
 import {Col, Row, Avatar, List, Statistic, Card} from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import {useEffect, useState} from "react";
 
 const CoinDetial: React.FC = () => {
     const data = [
@@ -37,6 +38,12 @@ const CoinDetial: React.FC = () => {
         min: 0,
         max: 1,
     }];
+    interface CoinDetailParams {
+        symbol: string;
+    }
+
+// ...
+
     return(
        <Row>
            <Col span={16}>
