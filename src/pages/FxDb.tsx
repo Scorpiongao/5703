@@ -3,64 +3,78 @@ import {Avatar, Card, Col, List, message, Row, Space, Statistic,} from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
-import * as $ from 'jquery';
 import axios from "axios";
+
 const DataSet = require('@antv/data-set');
 
 //chart
-const datachart = [
-    { year: '1991', value: 3 },
-    { year: '1992', value: 4 },
-    { year: '1993', value: 3.5 },
-    { year: '1994', value: 5 },
-    { year: '1995', value: 4.9 },
-    { year: '1996', value: 6 },
-    { year: '1997', value: 7 },
-    { year: '1998', value: 9 },
-    { year: '1999', value: 13 },
-];
+// const datachart = {year:"http://localhost:8080/dashboard/getDate" ,value:"http://localhost:8080/dashboard/getPrice"}
 
 const scale = [{
-    dataKey: 'value',
-    min: 0,
+    dataKey: "value",
+    nice:"ture"
 },{
-    dataKey: 'year',
-    min: 0,
-    max: 1,
+    dataKey: "year",
+    type:"time",
+    nice:"ture"
 }];
 
-
+const processData = (data: Record<string, string>) => {
+    return Object.entries(data).map(([year, value]) => ({
+        year,
+        value: parseFloat(value),
+    }));
+};
 
 //chart
 
 interface UserItem {
-    id:number;
-    title: string;
-    price: string;
-
+    email: string;
+    gender: string;
+    name: {
+        first: string;
+        last: string;
+        title: string;
+    };
+    nat: string;
+    picture: {
+        large: string;
+        medium: string;
+        thumbnail: string;
+    };
 }
 
 const fakeDataUrl =
-    'http://localhost:8080/dashboard/alpha_api';
+    'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
 const ContainerHeight = 900;
 const FxDb : React.FC = () => {
     const [datalist, setDatalist] = useState([]);
 
-    useEffect(() => {
+    /* useEffect(() => {
         axios.get('/dashboard/alpha_api').then(response => {
             setData(response.data);
         });
-    }, []);
+    }, []); */
 //
 //     //list
 //
 //
-    const [datachart1, setDatachart] = useState([]);
+    const [datachart1, setDatachart] = useState<{ year: string; value: number }[]>([]);
 
     useEffect(() => {
-        axios.get('/api/users').then(response => {
-            setData(response.data);
-        });
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/dashboard/alpha_api");
+                const data = await response.json();
+                const chartData = processData(data);
+                setDatachart(chartData);
+                //setDatachart(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
     }, []);
 //
 //
@@ -68,13 +82,13 @@ const FxDb : React.FC = () => {
 //
 //
 //
-    const [datanews, setDatanews] = useState([]);
+    /* const [datanews, setDatanews] = useState([]);
 
     useEffect(() => {
         axios.get('/api/users').then(response => {
             setData(response.data);
         });
-    }, []);
+    }, []); */
 
 //     //news
 
@@ -105,12 +119,11 @@ const FxDb : React.FC = () => {
         href: 'https://ant.design',
         title: `ant design part ${i}`,
         avatar: `https://joesch.moe/api/v1/random?key=${i}`,
-        description:
-            'Ant Design, a design language ',
+        // description:
+        //     'Ant Design, a design language ',
         content:
             'We supply a series of design principles, practical .',
     }));
-
 
     return (
         <Row >
@@ -125,11 +138,11 @@ const FxDb : React.FC = () => {
                         onScroll={onScroll}
                     >
                         {(item: UserItem) => (
-                            <List.Item key={item.id}>
+                            <List.Item key={item.email}>
                                 <List.Item.Meta
-                                    // avatar={<Avatar src={item.picture.large} />}
-                                    title={<a href="https://ant.design">{item.title}</a>}
-                                    description={item.price}
+                                    //avatar={<Avatar src={item.picture.large} />}
+                                    title={<a href="https://ant.design">{item.name.last}</a>}
+                                    description={item.email}
                                 />
 
                             </List.Item>
@@ -148,7 +161,7 @@ const FxDb : React.FC = () => {
                         suffix="%"
                     />
                 </Card>
-                <Chart forceFit height={750} data={data} scale={scale}>
+                <Chart forceFit height={750} data={datachart1} scale={scale}>
                     <Tooltip />
                     <Axis />
                     <Line position="year*value" />
