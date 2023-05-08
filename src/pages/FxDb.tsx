@@ -1,98 +1,93 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Card, Col, List, message, Row, Space, Statistic,} from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import {Avatar, Button, Card, Col, List, message, Row, Select, Space, Statistic,} from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined, SearchOutlined} from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
-import * as $ from 'jquery';
 import axios from "axios";
+import { Link , history } from "umi";
+import {array} from "@umijs/utils/compiled/zod/lib";
+
+
 const DataSet = require('@antv/data-set');
 
 //chart
-const datachart = [
-    { year: '1991', value: 3 },
-    { year: '1992', value: 4 },
-    { year: '1993', value: 3.5 },
-    { year: '1994', value: 5 },
-    { year: '1995', value: 4.9 },
-    { year: '1996', value: 6 },
-    { year: '1997', value: 7 },
-    { year: '1998', value: 9 },
-    { year: '1999', value: 13 },
-];
 
 const scale = [{
-    dataKey: 'value',
-    min: 0,
+    dataKey: "value",
+    nice:"ture"
 },{
-    dataKey: 'year',
-    min: 0,
-    max: 1,
+    dataKey: "year",
+    type:"time",
+    nice:"ture"
 }];
 
-
+const processData = (data: Record<string, string>) => {
+    return Object.entries(data).map(([year, value]) => ({
+        year,
+        value: parseFloat(value),
+    }));
+};
 
 //chart
 
-interface UserItem {
-    id:number;
-    title: string;
+interface FXItem {
+    symbol: string;
     price: string;
 
 }
 
-const fakeDataUrl =
-    'http://localhost:8080/dashboard/alpha_api';
+
 const ContainerHeight = 900;
 const FxDb : React.FC = () => {
-    const [datalist, setDatalist] = useState([]);
+    const [datalist, setDatalist] = useState<FXItem[]>([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/dashboard/currency-price-list");
+                const data = await response.json();
+                setDatalist(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+        fetchData();
+    }, []);
+    const [datachart1, setDatachart] = useState<{ year: string; value: number }[]>([]);
 
     useEffect(() => {
-        axios.get('/dashboard/alpha_api').then(response => {
-            setData(response.data);
-        });
-    }, []);
-//
-//     //list
-//
-//
-    const [datachart1, setDatachart] = useState([]);
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/dashboard/AUDtoCNY  ");
+                const data = await response.json();
+                const chartData = processData(data);
+                setDatachart(chartData);
+                //setDatachart(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
 
+        fetchData();
+    }, []);
+    const [page, setPage] = useState(1);
+    const fetchData = async (page: number) => {
+        try {
+            const response = await fetch(`http://localhost:8080/dashboard/currency-price-list?page=${page}`);
+            const data = await response.json();
+            setDatalist((prevData) => [...prevData, ...data]);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
     useEffect(() => {
-        axios.get('/api/users').then(response => {
-            setData(response.data);
-        });
+        fetchData(1);
     }, []);
-//
-//
-//     //chart
-//
-//
-//
-    const [datanews, setDatanews] = useState([]);
-
-    useEffect(() => {
-        axios.get('/api/users').then(response => {
-            setData(response.data);
-        });
-    }, []);
-
-//     //news
-
-
-    const [data, setData] = useState<UserItem[]>([]);
-
     const appendData = () => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((body) => {
-                setData(data.concat(body.results));
-                message.success(`${body.results.length} more items loaded!`);
-            });
+        setPage((prevPage) => prevPage + 1);
+        fetchData(page + 1);
     };
 
-    useEffect(() => {
-        appendData();
-    }, []);
+
 
     const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
         if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === ContainerHeight) {
@@ -101,96 +96,219 @@ const FxDb : React.FC = () => {
     };
 
 
-    const datatest = Array.from({ length: 23 }).map((_, i) => ({
-        href: 'https://ant.design',
-        title: `ant design part ${i}`,
-        avatar: `https://joesch.moe/api/v1/random?key=${i}`,
-        description:
-            'Ant Design, a design language ',
-        content:
-            'We supply a series of design principles, practical .',
-    }));
+    const [datanews, setDatatest] = useState<Array<{ href: string; title: string; avatar: string; content: string; }>>([]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/dashboard/news");
+                const data = await response.json();
+                setDatatest(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
+    const [title, setTitle] = useState('');
+    const [rate, setValue] = useState(0);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/dashboard/cardAUDtoCNY ');
+                const data = await response.json();
+
+                // Update this line to access the first element in the array
+                const firstDataItem = data[0];
+
+                setTitle(firstDataItem.title);
+                setValue(firstDataItem.rate);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+    const getStyleAndIcon = (value: number) => {
+        if (value >= 0) {
+            return {
+                color: '#3f8600',
+                icon: <ArrowUpOutlined />,
+            };
+        } else {
+            return {
+                color: '#cf1322',
+                icon: <ArrowDownOutlined />,
+            };
+        }
+    };
+
+    const { color, icon } = getStyleAndIcon(rate);
+    const [options, setOptions] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch('http://localhost:8080/dashboard/currency-name');
+            const data = await response.json();
+            const formattedOptions = data.map(item => ({
+                label: item.label,
+                value: item.label,
+
+            }));
+            setOptions(formattedOptions);
+        };
+
+        fetchData();
+    }, []);
+    const [selectedOption1, setSelectedOption1] = useState(null);
+    const [selectedOption2, setSelectedOption2] = useState(null);
+    const handleSubmit = async () => {
+
+        // await fetch(' http://localhost:8080/dashboard/postsearch', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         option1: selectedOption1,
+        //         option2: selectedOption2,
+        //     }),
+        // });
+
+        history.push('/FxDetial?option='+selectedOption1+'to'+selectedOption2);
+    };
+
+
+
+
+    //search
 
     return (
         <Row >
-            <Col span={5}>
+            <Col span={6}>
+                <div style={{ padding: '12px' }}>
+                    <List size="large">
+                        <VirtualList
+                            data={datalist}
+                            height={ContainerHeight}
+                            itemHeight={25}
+                            itemKey="email"
+                            onScroll={onScroll}
+                        >
+                            {(item:FXItem ) => (
+                                <List.Item key={item.symbol}>
+                                    <List.Item.Meta
+                                        // avatar={<Avatar src={item.picture.large} />}
+                                        title={<Link to={`/CoinDetial?title=${item.symbol}`}>{item.symbol}</Link>}
+                                        description={item.price}
+                                    />
 
-                <List size="large">
-                    <VirtualList
-                        data={data}
-                        height={ContainerHeight}
-                        itemHeight={30}
-                        itemKey="id"
-                        onScroll={onScroll}
-                    >
-                        {(item: UserItem) => (
-                            <List.Item key={item.id}>
-                                <List.Item.Meta
-                                    // avatar={<Avatar src={item.picture.large} />}
-                                    title={<a href="https://ant.design">{item.title}</a>}
-                                    description={item.price}
-                                />
-
-                            </List.Item>
-                        )}
-                    </VirtualList>
-                </List>
+                                </List.Item>
+                            )}
+                        </VirtualList>
+                    </List>
+                </div>
             </Col>
-            <Col span={11}>
+            <Col span={10}>
+                <div style={{ padding: '24px' }}>
+                    <Row gutter={[24,24]} align='middle' justify='center'>
+                        <Col>
+                            <Select
+                                showSearch
+                                style={{ width: 200 }}
+                                placeholder="Search to Select"
+                                optionFilterProp="children"
+                                filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                                filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                }
+                                options={options}
+                                onChange={setSelectedOption1}
+                            />
+                        </Col>
+
+                        <Col>
+                            <Select
+                                showSearch
+                                style={{ width: 200 }}
+                                placeholder="Search to Select"
+                                optionFilterProp="children"
+                                filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                                filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                }
+                                options={options}
+                                onChange={setSelectedOption2}
+                            />
+                        </Col>
+                        <Col>
+                            <Button type="primary" icon={<SearchOutlined />} onClick={handleSubmit}>
+                                Search
+                            </Button>
+                        </Col>
+
+                    </Row>
+                </div>
                 <Card bordered={false}>
                     <Statistic
-                        title="Active"
-                        value={11.28}
+                        title={title}
+                        value={rate}
                         precision={2}
-                        valueStyle={{ color: '#3f8600' }}
-                        prefix={<ArrowUpOutlined />}
+                        valueStyle={{ color }}
+                        prefix={icon}
                         suffix="%"
                     />
                 </Card>
-                <Chart forceFit height={750} data={data} scale={scale}>
-                    <Tooltip />
-                    <Axis />
-                    <Line position="year*value" />
-                    <Point position="year*value" shape="circle"/>
-                </Chart>
+                {/*<Chart forceFit height={750} data={data} scale={scale}>*/}
+                {/*    <Tooltip />*/}
+                {/*    <Axis />*/}
+                {/*    <Line position="year*value" />*/}
+                {/*    <Point position="year*value" shape="circle"/>*/}
+                {/*</Chart>*/}
+                <div style={{ padding: '8px' }}>
+                    <Chart forceFit height={600} data={datachart1} scale={scale}>
+                        <Tooltip />
+                        <Axis />
+                        <Line position="year*value" />
+                        <Point position="year*value" shape="circle"/>
+                    </Chart>
+                </div>
             </Col>
             <Col span={8}>
-                <List
-                    itemLayout="vertical"
-                    size="large"
-                    pagination={{
-                        onChange: (page) => {
-                            console.log(page);
-                        },
-                        pageSize: 4,
-                    }}
-                    dataSource={datatest}
-                    footer={
-                        <div>
+                <div style={{ padding: '24px' }}>
+                    <List
+                        itemLayout="vertical"
+                        size="large"
+                        pagination={{
+                            onChange: (page) => {
+                                console.log(page);
+                            },
+                            pageSize: 5,
+                        }}
+                        dataSource={datanews}
+                        footer={
+                            <div>
 
-                        </div>
-                    }
-                    renderItem={(item) => (
-                        <List.Item
-                            key={item.title}
-                            extra={
-                                <img
-                                    width={272}
-                                    alt="logo"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                            </div>
+                        }
+                        renderItem={(item) => (
+                            <List.Item
+
+                            >
+                                <List.Item.Meta
+                                    avatar={<Avatar src={item.avatar} />}
+                                    title={<a href={item.href}>{item.title}</a>}
+                                    description={item.description}
                                 />
-                            }
-                        >
-                            <List.Item.Meta
-                                avatar={<Avatar src={item.avatar} />}
-                                title={<a href={item.href}>{item.title}</a>}
-                                description={item.description}
-                            />
-                            {item.content}
-                        </List.Item>
-                    )}
-                />
+                                {item.content}
+                            </List.Item>
+                        )}
+                    />
+                </div>
             </Col>
         </Row>
     );

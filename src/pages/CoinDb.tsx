@@ -138,12 +138,9 @@ const CoinDb : React.FC = () => {
             try {
                 const response = await fetch('http://localhost:8080/dashboard/card  ');
                 const data = await response.json();
+                setValue(data.rate);
+                setTitle(data.title);
 
-                // Update this line to access the first element in the array
-                const firstDataItem = data[0];
-
-                setTitle(firstDataItem.title);
-                setValue(firstDataItem.rate);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
