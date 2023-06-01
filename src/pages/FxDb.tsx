@@ -1,5 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Card, Col, List, message, Row, Select, Space, Statistic,} from 'antd';
+import React, {useEffect, useState,useMemo} from 'react';
+import {Avatar, Button, Card, Col, List, message, Row, Select, Space, Statistic,Divider,notification} from 'antd';
+import type { NotificationPlacement } from 'antd/es/notification/interface';
+
 import { ArrowDownOutlined, ArrowUpOutlined, SearchOutlined} from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
@@ -9,7 +11,7 @@ import {array} from "@umijs/utils/compiled/zod/lib";
 
 
 const DataSet = require('@antv/data-set');
-
+const Context = React.createContext({ name: 'Default' });
 //chart
 
 const scale = [{
@@ -185,7 +187,29 @@ const FxDb : React.FC = () => {
 
 
 
+
     //search
+
+    const openNotification1 = () => {
+        notification.open({
+            message: 'Hi, this is your tour guide! ',
+            description:
+                'Left is all ForEx rate. Have fun ',
+            onClick: () => {
+                console.log('Notification Clicked!');
+            },
+        });
+    };
+    const openNotification2 = () => {
+        notification.open({
+            message: 'Hi, this is your tour guide!',
+            description:
+                'Right is related news. Have fun!',
+            onClick: () => {
+                console.log('Notification Clicked!');
+            },
+        });
+    };
 
     return (
         <Row >
@@ -194,8 +218,8 @@ const FxDb : React.FC = () => {
                     <List size="large">
                         <VirtualList
                             data={datalist}
-                            height={ContainerHeight}
-                            itemHeight={25}
+                            height={850}
+                            itemHeight={20}
                             itemKey="email"
                             onScroll={onScroll}
                         >
@@ -203,7 +227,7 @@ const FxDb : React.FC = () => {
                                 <List.Item key={item.symbol}>
                                     <List.Item.Meta
                                         // avatar={<Avatar src={item.picture.large} />}
-                                        title={<Link to={`/CoinDetial?title=${item.symbol}`}>{item.symbol}</Link>}
+                                        title={<Link to={`/FxDetial?option=${item.symbol}`}>{item.symbol}</Link>}
                                         description={item.price}
                                     />
 
@@ -212,6 +236,9 @@ const FxDb : React.FC = () => {
                         </VirtualList>
                     </List>
                 </div>
+                <Button type="primary" onClick={openNotification1}>
+                    Left List intro
+                </Button>
             </Col>
             <Col span={10}>
                 <div style={{ padding: '24px' }}>
@@ -220,7 +247,7 @@ const FxDb : React.FC = () => {
                             <Select
                                 showSearch
                                 style={{ width: 200 }}
-                                placeholder="Search to Select"
+                                placeholder="From"
                                 optionFilterProp="children"
                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                 filterSort={(optionA, optionB) =>
@@ -235,7 +262,7 @@ const FxDb : React.FC = () => {
                             <Select
                                 showSearch
                                 style={{ width: 200 }}
-                                placeholder="Search to Select"
+                                placeholder="To"
                                 optionFilterProp="children"
                                 filterOption={(input, option) => (option?.label ?? '').includes(input)}
                                 filterSort={(optionA, optionB) =>
@@ -244,6 +271,7 @@ const FxDb : React.FC = () => {
                                 options={options}
                                 onChange={setSelectedOption2}
                             />
+
                         </Col>
                         <Col>
                             <Button type="primary" icon={<SearchOutlined />} onClick={handleSubmit}>
@@ -287,7 +315,7 @@ const FxDb : React.FC = () => {
                             onChange: (page) => {
                                 console.log(page);
                             },
-                            pageSize: 5,
+                            pageSize: 4,
                         }}
                         dataSource={datanews}
                         footer={
@@ -309,6 +337,9 @@ const FxDb : React.FC = () => {
                         )}
                     />
                 </div>
+                <Button type="primary" onClick={openNotification2}>
+                    Right List intro
+                </Button>
             </Col>
         </Row>
     );

@@ -1,25 +1,34 @@
 import * as React from 'react';
-import {Col, Row, Avatar, List, Statistic, Card, Space} from "antd";
+import {Col, Row, Avatar, List, Statistic, Card, Space, FloatButton} from "antd";
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import {useEffect, useState} from "react";
 
 const blogmain: React.FC = () => {
-    const data = Array.from({ length: 23 }).map((_, i) => ({
-        href: 'https://ant.design',
-        title: `ant design part ${i}`,
-        avatar: `https://xsgames.co/randomusers/avatar.php?g=pixel&key=${i}`,
-        description:
-            'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-        content:
-            'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-    }));
 
-    const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-        <Space>
-            {React.createElement(icon)}
-            {text}
-        </Space>
-    );
 
+
+
+    const [datablog, setDatatest] = useState<Array<{ title: string; description: string; content: string;  }>>([]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const fetchData = async () => {
+            try {
+                const response = await fetch("http://localhost:8080/blog/view/findAllBlogs", {
+                    headers: {
+                        'token': `${token}` // 添加token到请求头
+                    }
+                });
+
+                const data = await response.json();
+                setDatatest(data);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
     return(
         <Row>
             <Col span={4}>
@@ -35,34 +44,21 @@ const blogmain: React.FC = () => {
                         },
                         pageSize: 4,
                     }}
-                    dataSource={data}
+                    dataSource={datablog}
 
                     renderItem={(item) => (
                         <List.Item
-                            key={item.title}
-                            actions={[
-                                <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                                <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
-                                <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-                            ]}
-                            extra={
-                                <img
-                                    width={272}
-                                    alt="logo"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-                                />
-                            }
+
                         >
                             <List.Item.Meta
-                                avatar={<Avatar src={item.avatar} />}
-                                title={<a href={item.href}>{item.title}</a>}
+                                title={<a >{item.title}</a>}
                                 description={item.description}
                             />
                             {item.content}
                         </List.Item>
                     )}
                 />
-
+                <FloatButton tooltip={<div>Write Blog</div>} href={'/BlogWrite'}/>
             </Col>
             <col span={4}>
 

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Card, Col, Input, List, message, Row, Select, Space, Statistic,} from 'antd';
+import {Avatar, Button, Card, Col, Input, List, message, notification, Row, Select, Space, Statistic,} from 'antd';
 import { ArrowDownOutlined, ArrowUpOutlined,SearchOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import { Chart, Tooltip, Axis, Line, Point } from 'viser-react';
 import queryString from 'query-string';
-import { Link } from 'umi';
+import {history, Link} from 'umi';
 import * as $ from 'jquery';
 import {print} from "jest-util";
 import {array} from "@umijs/utils/compiled/zod/lib";
@@ -164,6 +164,66 @@ const CoinDb : React.FC = () => {
     };
 
     const { color, icon } = getStyleAndIcon(rate);
+    const [options1, setOptions1] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(' http://localhost:8080/dashboard/crypto-name');
+            const data = await response.json();
+            const formattedOptions = data.map(item => ({
+                label: item.label,
+                value: item.label,
+
+            }));
+            setOptions1(formattedOptions);
+        };
+
+        fetchData();
+    }, []);
+    const [options2, setOptions2] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetch(' http://localhost:8080/dashboard/crypto-name-2');
+            const data = await response.json();
+            const formattedOptions = data.map(item => ({
+                label: item.label,
+                value: item.label,
+
+            }));
+            setOptions2(formattedOptions);
+        };
+
+        fetchData();
+    }, []);
+    const [selectedOption1, setSelectedOption1] = useState(null);
+    const [selectedOption2, setSelectedOption2] = useState(null);
+    const handleSubmit = async () => {
+
+
+
+        history.push('/CoinDetial?option='+selectedOption1+'to'+selectedOption2);
+    };
+    const openNotification1 = () => {
+        notification.open({
+            message: 'Hi, this is your tour guide! ',
+            description:
+                'Left is all cryptocurrency rate. Have fun ',
+            onClick: () => {
+                console.log('Notification Clicked!');
+            },
+        });
+    };
+    const openNotification2 = () => {
+        notification.open({
+            message: 'Hi, this is your tour guide!',
+            description:
+                'Right is related cryptocurrency news. Have fun!',
+            onClick: () => {
+                console.log('Notification Clicked!');
+            },
+        });
+    };
 
 
     return (
@@ -191,6 +251,9 @@ const CoinDb : React.FC = () => {
                     </VirtualList>
                 </List>
                 </div>
+                <Button type="primary" onClick={openNotification1}>
+                    Left List intro
+                </Button>
             </Col>
             <Col span={10}>
                 <div style={{ padding: '24px' }}>
@@ -205,32 +268,8 @@ const CoinDb : React.FC = () => {
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }
-                            options={[
-                                {
-                                    value: '1',
-                                    label: 'Not Identified',
-                                },
-                                {
-                                    value: '2',
-                                    label: 'Closed',
-                                },
-                                {
-                                    value: '3',
-                                    label: 'Communicated',
-                                },
-                                {
-                                    value: '4',
-                                    label: 'Identified',
-                                },
-                                {
-                                    value: '5',
-                                    label: 'Resolved',
-                                },
-                                {
-                                    value: '6',
-                                    label: 'Cancelled',
-                                },
-                            ]}
+                            options={options1}
+                            onChange={setSelectedOption1}
                         />
                     </Col>
 
@@ -244,36 +283,12 @@ const CoinDb : React.FC = () => {
                             filterSort={(optionA, optionB) =>
                                 (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                             }
-                            options={[
-                                {
-                                    value: '1',
-                                    label: 'Not Identified',
-                                },
-                                {
-                                    value: '2',
-                                    label: 'Closed',
-                                },
-                                {
-                                    value: '3',
-                                    label: 'Communicated',
-                                },
-                                {
-                                    value: '4',
-                                    label: 'Identified',
-                                },
-                                {
-                                    value: '5',
-                                    label: 'Resolved',
-                                },
-                                {
-                                    value: '6',
-                                    label: 'Cancelled',
-                                },
-                            ]}
+                            options={options2}
+                            onChange={setSelectedOption2}
                         />
                     </Col>
                     <Col>
-                        <Button type="primary" icon={<SearchOutlined />}>
+                        <Button type="primary" icon={<SearchOutlined />} onClick={handleSubmit}>
                             Search
                         </Button>
                     </Col>
@@ -336,6 +351,9 @@ const CoinDb : React.FC = () => {
                     )}
                 />
                 </div>
+                <Button type="primary" onClick={openNotification2}>
+                    Right List intro
+                </Button>
             </Col>
         </Row>
     );

@@ -11,7 +11,11 @@ export default defineConfig({
     { path: "/FxDb", component: "FxDb"},
     { path: "/CoinDb", component: "CoinDb"},
     { path:"/CoinDetial", component: "CoinDetial"},
-    { path:"/FxDetial",component: "FxDetial"}
+    { path:"/FxDetial",component: "FxDetial"},
+    { path:"/blogmain",component: "blogmain" },
+    { path:"/BlogWrite",component: "BlogWrite" },
+    { path:"/MyProfile",component: "MyProfile" },
+    { path:"/blogUpdate",component: "blogUpdate" },
   ],
   npmClient: 'npm',
 });
